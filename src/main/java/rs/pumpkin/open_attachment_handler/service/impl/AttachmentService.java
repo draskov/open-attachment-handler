@@ -5,8 +5,6 @@ import com.azure.storage.blob.models.BlobStorageException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.util.CollectionUtils;
 import rs.pumpkin.open_attachment_handler.AttachmentManagerProperties;
 import rs.pumpkin.open_attachment_handler.exception.AttachmentNotFoundException;
 import rs.pumpkin.open_attachment_handler.exception.ExternalServiceException;
@@ -94,7 +92,7 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
             .orElseThrow(() -> new AttachmentNotFoundException(
                 String.format("Attachment with id %s is not found", id)
             ));
-        ByteArrayResource byteArrayResource;
+        byte[] byteArrayResource;
         if (attachment.isForeignSource()) {
             URL url = getUrl(attachment);
             try {
@@ -110,14 +108,14 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
 
                 log.info("Response with status {} for the attachment {} and url {} with body {}", response.statusCode(), id, url, response.body());
 
-                byteArrayResource = new ByteArrayResource(response.body());
+                byteArrayResource = response.body();
 
             } catch (URISyntaxException | IOException | InterruptedException e) {
                 log.error("Error fetching attachment from URI: {}", url);
                 throw new RuntimeException(e);
             }
         } else {
-            byteArrayResource = new ByteArrayResource(fileService.getFileContent(attachment.getPath()));
+            byteArrayResource = fileService.getFileContent(attachment.getPath());
         }
 
         AttachmentContent attachmentContent = new AttachmentContent();
