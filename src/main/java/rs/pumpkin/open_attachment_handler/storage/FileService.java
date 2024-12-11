@@ -1,4 +1,4 @@
-package rs.pumpkin.open_attachment_handler.service;
+package rs.pumpkin.open_attachment_handler.storage;
 
 
 public interface FileService {

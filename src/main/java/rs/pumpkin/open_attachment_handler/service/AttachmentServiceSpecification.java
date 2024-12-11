@@ -15,7 +15,7 @@ public interface AttachmentServiceSpecification<H extends AttachmentHolder> {
 
     Set<? extends AbstractAttachment<H>> updateAttachments(
             H holder,
-            List<? extends LinkAttachment> linkAttachmentDTO,
+            List<? extends LinkAttachment> linkAttachment,
             String sourceName
     );
 

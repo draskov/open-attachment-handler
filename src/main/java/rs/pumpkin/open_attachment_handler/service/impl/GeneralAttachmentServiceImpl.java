@@ -7,7 +7,7 @@ import rs.pumpkin.open_attachment_handler.exception.ExternalServiceException;
 import rs.pumpkin.open_attachment_handler.exception.InternalException;
 import rs.pumpkin.open_attachment_handler.model.AttachmentContent;
 import rs.pumpkin.open_attachment_handler.model.AttachmentParams;
-import rs.pumpkin.open_attachment_handler.service.FileService;
+import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.service.GeneralAttachmentService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
 

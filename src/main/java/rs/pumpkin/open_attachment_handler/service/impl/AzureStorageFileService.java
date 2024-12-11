@@ -8,7 +8,7 @@ import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.azure.storage.common.sas.SasProtocol;
 import com.computerrock.attachmentmanager.model.enums.AllowedFileType;
 import lombok.RequiredArgsConstructor;
-import rs.pumpkin.open_attachment_handler.service.FileService;
+import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
 
 import java.time.OffsetDateTime;

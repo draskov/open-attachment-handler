@@ -17,7 +17,7 @@ import rs.pumpkin.open_attachment_handler.ports.AttachmentFactory;
 import rs.pumpkin.open_attachment_handler.ports.AttachmentHolder;
 import rs.pumpkin.open_attachment_handler.ports.AttachmentRepository;
 import rs.pumpkin.open_attachment_handler.service.AttachmentServiceSpecification;
-import rs.pumpkin.open_attachment_handler.service.FileService;
+import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.service.HolderService;
 import rs.pumpkin.open_attachment_handler.service.TokenService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
@@ -39,13 +39,13 @@ import java.util.stream.StreamSupport;
 @Data
 @RequiredArgsConstructor
 @Slf4j
-public class AttachmentService<H extends AttachmentHolder, E extends AbstractAttachment<H>> implements AttachmentServiceSpecification<H> {
+public class AttachmentService<H extends AttachmentHolder, A extends AbstractAttachment<H>> implements AttachmentServiceSpecification<H> {
 
     protected final FileService fileService;
     protected final AttachmentManagerProperties attachmentManagerProperties;
-    protected final AttachmentFactory<E> attachmentFactory;
-    protected final AbstractAttachmentMapperHelper<H, E> attachmentMapperHelper;
-    protected final AttachmentRepository<E, H> attachmentRepository;
+    protected final AttachmentFactory<A> attachmentFactory;
+    protected final AbstractAttachmentMapperHelper<H, A> attachmentMapperHelper;
+    protected final AttachmentRepository<A, H> attachmentRepository;
     private final TokenService tokenService;
     private final HolderService<H> holderService;
     private static final String DOWNLOAD_ENDPOINT = "url";
@@ -53,26 +53,26 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
     @Override
     public Set<? extends AbstractAttachment<H>> updateAttachments(
         H holder,
-        List<? extends LinkAttachment> linkAttachmentDTO,
+        List<? extends LinkAttachment> linkAttachments,
         String sourceName
     ) {
-        if (linkAttachmentDTO == null) {
+        if (linkAttachments == null) {
             return Collections.emptySet();
         }
 
-        List<E> existingAttachments = new ArrayList<>((Collection<E>) findAllByHolderAndSource(holder, sourceName));
-        removeAttachments(existingAttachments, linkAttachmentDTO);
+        List<A> existingAttachments = new ArrayList<>((Collection<A>) findAllByHolderAndSource(holder, sourceName));
+        removeAttachments(existingAttachments, linkAttachments);
 
-        List<E> inserted = insertAttachments(
+        List<A> inserted = insertAttachments(
             holder,
             existingAttachments,
-            linkAttachmentDTO.stream().map(la -> createAttachment(holder, la, sourceName)).toList()
+            linkAttachments.stream().map(la -> createAttachment(holder, la, sourceName)).toList()
         );
 
         var existingUUIDs = existingAttachments.stream()
             .map(AbstractAttachment::getId)
             .collect(Collectors.toSet());
-        linkAttachmentDTO.stream().filter(l -> existingUUIDs
+        linkAttachments.stream().filter(l -> existingUUIDs
                 .contains(l.getId()))
             .forEach(l -> updateAttachmentData(l.getId(), l));
         return Stream.of(existingAttachments, inserted)
@@ -88,7 +88,7 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
 
     @Override
     public AttachmentContent getContentById(UUID id) {
-        E attachment = attachmentRepository.findById(id)
+        A attachment = attachmentRepository.findById(id)
             .orElseThrow(() -> new AttachmentNotFoundException(
                 String.format("Attachment with id %s is not found", id)
             ));
@@ -126,14 +126,14 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
 
 
     protected void updateAttachmentData(UUID id, LinkAttachment linkAttachmentDTO) {
-        E attachment = attachmentRepository.findById(id).orElseThrow(() -> new AttachmentNotFoundException(
+        A attachment = attachmentRepository.findById(id).orElseThrow(() -> new AttachmentNotFoundException(
             String.format("Attachment with id %s is not found", id)
         ));
         attachmentMapperHelper.updateAttachmentData(attachment, linkAttachmentDTO);
         attachmentRepository.save(attachment);
     }
 
-    protected void moveAttachment(E attachment) {
+    protected void moveAttachment(A attachment) {
         // Move Attachment from /tmp...
 
         String sourcePath = fileService.getTempDir() +
@@ -147,8 +147,8 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
     }
 
 
-    public E createAttachment(H holder, LinkAttachment linkAttachment, String sourceName) {
-        E attachment = attachmentFactory.create(linkAttachment);
+    public A createAttachment(H holder, LinkAttachment linkAttachment, String sourceName) {
+        A attachment = attachmentFactory.create(linkAttachment);
         attachment.setExtension(FileUtils.getExtension(linkAttachment.getFileName()));
         attachment.setHolder(holder);
         attachment.setSourceName(sourceName);
@@ -158,22 +158,22 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
     }
 
     public void removeAttachments(
-        List<E> existingAttachments,
-        List<? extends LinkAttachment> linkAttachmentDTO
+        List<A> existingAttachments,
+        List<? extends LinkAttachment> linkAttachments
     ) {
         Set<UUID> removed = existingAttachments.stream()
             // Candidates for removal from existing...
-            .filter(attachment -> linkAttachmentDTO.stream()
+            .filter(attachment -> linkAttachments.stream()
                 .map(LinkAttachment::getId)
                 .noneMatch(id -> id.equals(attachment.getId()))
             )
-            // Remove each from Azure Blob storage...
+            // Remove each from file service
             .peek(attachment -> {
                 if (!attachment.isForeignSource()) {
                     fileService.remove(attachment.getPath());
                 }
             })
-            .map(E::getId)
+            .map(A::getId)
             .collect(Collectors.toSet());
 
 
@@ -190,12 +190,12 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
         fileService.save(resource, generateRelativePath(attachment));
     }
 
-    public List<E> insertAttachments(
+    public List<A> insertAttachments(
         H holder,
-        List<E> existingAttachments,
-        List<E> givenAttachmentsList
+        List<A> existingAttachments,
+        List<A> givenAttachmentsList
     ) {
-        List<E> toInsert = givenAttachmentsList.stream()
+        List<A> toInsert = givenAttachmentsList.stream()
             .filter(link -> existingAttachments.stream()
                 .map(AbstractAttachment::getId)
                 .noneMatch(uuid -> uuid.equals(link.getId()))
@@ -269,12 +269,15 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
 
     @Override
     public void add(AbstractAttachment<H> attachment) {
-        attachmentRepository.save((E) attachment);
+        attachmentRepository.save((A) attachment);
     }
 
     @Override
     public List<AttachmentContent> getAttachmentContentsByIds(Set<UUID> ids) {
-        if (CollectionUtils.isEmpty(ids)) {
+        if (ids == null) {
+            return Collections.emptyList();
+        }
+        if (ids.isEmpty()) {
             return Collections.emptyList();
         }
         var exceptionLogMessageTemplate = "Attachment with uuid {} encountered exception {}. Exception message: {}";
@@ -322,7 +325,7 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
             return Collections.emptyList();
         }
 
-        Set<E> existingAttachments = (Set<E>) findAllByHolder(holder);
+        Set<A> existingAttachments = (Set<A>) findAllByHolder(holder);
         return getAttachmentContentsByIds(
             existingAttachments.stream()
                 .map(AbstractAttachment::getId)
@@ -334,18 +337,18 @@ public class AttachmentService<H extends AttachmentHolder, E extends AbstractAtt
     @Override
     public String generateRelativePath(AbstractAttachment<H> attachment) {
          attachment.setPath(attachment.getHolderId() + "/" + attachment.getId() + "." + attachment.getExtension());
-         attachmentRepository.save((E) attachment);
+         attachmentRepository.save((A) attachment);
          return attachment.getPath();
     }
 
     @Override
     public void copy(Collection<H> sources, H target) {
-        final List<E> attList = new ArrayList<>();
+        final List<A> attList = new ArrayList<>();
 
         sources.forEach(source -> {
             attachmentRepository.findAllByHolder(source)
                 .stream()
-                .map(att -> (E) att.copy())
+                .map(att -> (A) att.copy())
                 .forEach(attList::add);
 
             attList.forEach(
