@@ -17,9 +17,9 @@ import rs.pumpkin.open_attachment_handler.ports.AttachmentFactory;
 import rs.pumpkin.open_attachment_handler.ports.AttachmentHolder;
 import rs.pumpkin.open_attachment_handler.ports.AttachmentRepository;
 import rs.pumpkin.open_attachment_handler.service.AttachmentServiceSpecification;
-import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.service.HolderService;
 import rs.pumpkin.open_attachment_handler.service.TokenService;
+import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
 
 import java.io.IOException;
@@ -34,7 +34,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Data
 @RequiredArgsConstructor
@@ -72,17 +71,18 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
         var existingUUIDs = existingAttachments.stream()
             .map(AbstractAttachment::getId)
             .collect(Collectors.toSet());
+
         linkAttachments.stream().filter(l -> existingUUIDs
                 .contains(l.getId()))
             .forEach(l -> updateAttachmentData(l.getId(), l));
+
         return Stream.of(existingAttachments, inserted)
             .flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     @Override
     public Set<? extends AbstractAttachment<H>> findByIds(Set<UUID> ids) {
-        return StreamSupport.stream(attachmentRepository.findAllById(ids).spliterator(), false)
-                .collect(Collectors.toSet());
+        return new HashSet<>(attachmentRepository.findAllById(ids));
     }
 
 

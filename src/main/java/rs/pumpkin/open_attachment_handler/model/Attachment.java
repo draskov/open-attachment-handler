@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.net.URL;
-import java.security.SecureRandom;
 import java.util.UUID;
 
 @Data
@@ -16,7 +15,7 @@ import java.util.UUID;
 public abstract class Attachment implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = new SecureRandom().nextLong();
+    private static final long serialVersionUID = 7475231198145102948L;
 
     protected UUID id;
     protected URL url;

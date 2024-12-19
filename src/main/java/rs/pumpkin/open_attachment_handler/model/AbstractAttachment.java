@@ -3,38 +3,38 @@ package rs.pumpkin.open_attachment_handler.model;
 import java.time.Instant;
 import java.util.UUID;
 
-public abstract class AbstractAttachment<H> {
-    public abstract UUID getId();
+public interface AbstractAttachment<H> {
+     UUID getId();
 
-    public abstract String getFileName();
+     String getFileName();
 
-    public abstract String getHolderId();
+     String getHolderId();
 
-    public abstract String getExtension();
+     String getExtension();
 
-    public abstract H getHolder();
+     H getHolder();
 
-    public abstract void setId(UUID newValue);
+     void setId(UUID newValue);
 
-    public abstract void setFileName(String newValue);
+     void setFileName(String newValue);
 
-    public abstract void setExtension(String newValue);
+     void setExtension(String newValue);
 
-    public abstract void setHolder(H newValue);
+     void setHolder(H newValue);
 
-    public abstract void setPath(String path);
+     void setPath(String path);
 
-    public abstract void setSourceName(String sourceName);
+     void setSourceName(String sourceName);
 
-    public abstract String getSourceName();
+     String getSourceName();
 
-    public abstract void setForeignSource(boolean isForeignSource);
+     void setForeignSource(boolean isForeignSource);
 
-    public abstract boolean isForeignSource();
+     boolean isForeignSource();
 
-    public abstract String getPath();
+     String getPath();
 
-    public abstract void setCreatedAt(Instant time);
+     void setCreatedAt(Instant time);
 
-    public abstract AbstractAttachment<H> copy();
+     AbstractAttachment<H> copy();
 }
