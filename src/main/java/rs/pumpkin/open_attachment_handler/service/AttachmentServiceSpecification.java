@@ -11,19 +11,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public interface AttachmentServiceSpecification<H extends AttachmentHolder> {
+public interface AttachmentServiceSpecification<A extends AbstractAttachment<H>, H extends AttachmentHolder> {
 
-    Set<? extends AbstractAttachment<H>> updateAttachments(
+    Set<A> updateAttachments(
             H holder,
             List<? extends LinkAttachment> linkAttachment,
             String sourceName
     );
 
-    Set<? extends AbstractAttachment<H>> findAllByHolder(H holder);
+    Set<A> findAllByHolder(H holder);
 
-    Set<? extends AbstractAttachment<H>> findAllByHolderAndSource(H holder, String sourceName);
+    Set<A> findAllByHolderAndSource(H holder, String sourceName);
 
-    Set<? extends AbstractAttachment<H>> findByIds(Set<UUID> ids);
+    Set<A> findByIds(Set<UUID> ids);
 
     AttachmentContent getContentById(UUID id);
 
