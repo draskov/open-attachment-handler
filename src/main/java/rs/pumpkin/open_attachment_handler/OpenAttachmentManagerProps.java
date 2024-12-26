@@ -2,13 +2,10 @@ package rs.pumpkin.open_attachment_handler;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class AttachmentManagerProperties {
+public class OpenAttachmentManagerProps {
 
     private PrivateUrlInfo privateUrl;
-    private List<AttachmentSource> sources;
 
     @Data
     public static class PrivateUrlInfo {
@@ -16,9 +13,4 @@ public class AttachmentManagerProperties {
         private String baseUri;
     }
 
-    @Data
-    public static class AttachmentSource {
-        private String name;
-        private String baseUri;
-    }
 }

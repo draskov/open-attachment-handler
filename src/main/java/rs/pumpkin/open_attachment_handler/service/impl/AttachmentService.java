@@ -5,7 +5,7 @@ import com.azure.storage.blob.models.BlobStorageException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import rs.pumpkin.open_attachment_handler.AttachmentManagerProperties;
+import rs.pumpkin.open_attachment_handler.OpenAttachmentManagerProps;
 import rs.pumpkin.open_attachment_handler.exception.AttachmentNotFoundException;
 import rs.pumpkin.open_attachment_handler.exception.ExternalServiceException;
 import rs.pumpkin.open_attachment_handler.exception.InternalException;
@@ -32,7 +32,7 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
 
     protected final FileService fileService;
     protected final AttachmentRepository<A, H> attachmentRepository;
-    protected final AttachmentManagerProperties attachmentManagerProperties;
+    protected final OpenAttachmentManagerProps openAttachmentManagerProps;
     private final HolderService<H> holderService;
     private static final String DOWNLOAD_ENDPOINT = "url";
 
@@ -152,8 +152,8 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
     public URL getUrl(A attachment) {
         String fileFullUrl;
         try {
-            if (Boolean.TRUE.equals(attachmentManagerProperties.getPrivateUrl().getEnabled())) {
-                String baseUrl = attachmentManagerProperties.getPrivateUrl().getBaseUri();
+            if (Boolean.TRUE.equals(openAttachmentManagerProps.getPrivateUrl().getEnabled())) {
+                String baseUrl = openAttachmentManagerProps.getPrivateUrl().getBaseUri();
                 fileFullUrl = getFileFullUrl(attachment.getId().toString(), baseUrl);
             } else {
                 fileFullUrl = fileService.getFileFullUrl(
