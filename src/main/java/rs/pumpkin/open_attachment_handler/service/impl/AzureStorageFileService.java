@@ -27,10 +27,11 @@ public class AzureStorageFileService implements FileService {
     @Override
     public String getUploadingUrl(String fileName, String extension) {
 
-        String blobName = new StringBuilder(tempDirPath)
-                .append('/').append(fileName)
-                .append('.').append(extension)
-                .toString();
+        String blobName = tempDirPath
+                + FILE_SEPARATOR
+                + fileName
+                + DOT
+                + extension;
 
         final var url = blobContainerClient
                 .getBlobClient(blobName)
@@ -76,11 +77,9 @@ public class AzureStorageFileService implements FileService {
         String path = Stream.concat(
                 Stream.of(dirs),
                 Stream.of(fileName)
-        ).collect(Collectors.joining("/"));
+        ).collect(Collectors.joining(FILE_SEPARATOR));
 
-        var blobName = new StringBuilder(path)
-                .append(".").append(extension)
-                .toString();
+        var blobName = path + DOT + extension;
 
         final var url = blobContainerClient
                 .getBlobClient(blobName)
