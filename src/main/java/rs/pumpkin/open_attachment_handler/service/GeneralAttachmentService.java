@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface GeneralAttachmentService {
-    AttachmentParams getUploadParameters(String fileName);
+    AttachmentParams getUploadParameters(String holderName, String fileName);
     AttachmentContent getContentById(UUID id);
     List<AttachmentContent> getContentsByIds(Set<UUID> ids);
-    List<AttachmentContent> getContentsByHolderId(String holderId);
+    List<AttachmentContent> getContentsByHolderId(String holderName, String holderId);
 }

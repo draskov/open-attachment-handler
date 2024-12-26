@@ -24,14 +24,6 @@ public interface AbstractAttachment<H> {
 
      void setPath(String path);
 
-     void setSourceName(String sourceName);
-
-     String getSourceName();
-
-     void setForeignSource(boolean isForeignSource);
-
-     boolean isForeignSource();
-
      String getPath();
 
      void setCreatedAt(Instant time);

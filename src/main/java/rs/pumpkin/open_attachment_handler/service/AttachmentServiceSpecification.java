@@ -2,8 +2,8 @@ package rs.pumpkin.open_attachment_handler.service;
 
 import rs.pumpkin.open_attachment_handler.model.AbstractAttachment;
 import rs.pumpkin.open_attachment_handler.model.AttachmentContent;
-import rs.pumpkin.open_attachment_handler.model.LinkAttachment;
 import rs.pumpkin.open_attachment_handler.ports.AttachmentHolder;
+import rs.pumpkin.open_attachment_handler.storage.FileService;
 
 import java.net.URL;
 import java.util.Collection;
@@ -13,31 +13,29 @@ import java.util.UUID;
 
 public interface AttachmentServiceSpecification<A extends AbstractAttachment<H>, H extends AttachmentHolder> {
 
-    Set<A> updateAttachments(
-            H holder,
-            List<? extends LinkAttachment> linkAttachment,
-            String sourceName
-    );
+    Set<A> updateAttachments(H holder, List<A> linkAttachment);
 
     Set<A> findAllByHolder(H holder);
-
-    Set<A> findAllByHolderAndSource(H holder, String sourceName);
 
     Set<A> findByIds(Set<UUID> ids);
 
     AttachmentContent getContentById(UUID id);
 
-    URL getUrl(AbstractAttachment<H> attachment);
+    URL getUrl(A attachment);
 
-    void upload(AbstractAttachment<H> attachment, byte[] resource);
+    void upload(A attachment, byte[] resource);
 
-    void add(AbstractAttachment<H> attachment);
+    void add(A attachment);
 
     List<AttachmentContent> getAttachmentContentsByIds(Set<UUID> ids);
 
     List<AttachmentContent> getAttachmentContentByHolderID(String holderId);
 
-    String generateRelativePath(AbstractAttachment<H> attachment);
+    String generateRelativePath(A attachment);
 
     void copy(Collection<H> sources, H target);
+
+    FileService getFileService();
+
+    String getHolderName();
 }

@@ -7,32 +7,36 @@ import rs.pumpkin.open_attachment_handler.exception.ExternalServiceException;
 import rs.pumpkin.open_attachment_handler.exception.InternalException;
 import rs.pumpkin.open_attachment_handler.model.AttachmentContent;
 import rs.pumpkin.open_attachment_handler.model.AttachmentParams;
-import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.service.GeneralAttachmentService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 @Slf4j
 public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
 
-    protected final FileService fileService;
     protected final List<AttachmentService<?, ?>> attachmentService;
 
     public GeneralAttachmentServiceImpl(
-            FileService fileService,
             List<AttachmentService<?, ?>> attachmentService
     ) {
-        this.fileService = fileService;
         this.attachmentService = attachmentService;
     }
 
     @Override
-    public AttachmentParams getUploadParameters(String fileName) {
+    public AttachmentParams getUploadParameters(
+            String holderName,
+            String fileName
+    ) {
         String extension = FileUtils.getExtension(fileName);
         String id = UUID.randomUUID().toString();
 
-        final String attachmentUploadingUrl = fileService
+        final String attachmentUploadingUrl = attachmentService.stream()
+                .filter(service -> service.getHolderName().equals(holderName))
+                .map(AttachmentService::getFileService)
+                .findFirst()
+                .orElseThrow(getIllegalStateExceptionSupplier())
                 .getUploadingUrl(id, extension);
 
         return AttachmentParams.builder()
@@ -95,18 +99,16 @@ public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
     }
 
     @Override
-    public List<AttachmentContent> getContentsByHolderId(String holderId) {
-        if (attachmentService.isEmpty()) {
-            throw new IllegalStateException("There is no available Attachment services.");
-        }
-        var attachmentContents = new ArrayList<AttachmentContent>();
-        attachmentService.forEach(attachmentServiceCurr -> {
-                    var results = attachmentServiceCurr.getAttachmentContentByHolderID(holderId);
-                    if (!results.isEmpty()) {
-                        attachmentContents.addAll(results);
-                    }
-                }
-        );
-        return attachmentContents;
+    public List<AttachmentContent> getContentsByHolderId(String holderName, String holderId) {
+        return attachmentService
+                .stream()
+                .filter(service -> service.getHolderName().equals(holderName))
+                .findFirst()
+                .orElseThrow(getIllegalStateExceptionSupplier())
+                .getAttachmentContentByHolderID(holderId);
+    }
+
+    private static Supplier<IllegalStateException> getIllegalStateExceptionSupplier() {
+        return () -> new IllegalStateException("There is no available Attachment services.");
     }
 }

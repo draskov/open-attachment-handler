@@ -16,4 +16,6 @@ public interface FileService {
     void save(byte[] file, String filePath);
 
     String getTempDir();
+
+    String generatePath(String fileName, String extension, String... folders);
 }
