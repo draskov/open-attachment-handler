@@ -20,8 +20,8 @@ public class AzureStorageFileService implements FileService {
 
     private final BlobContainerClient blobContainerClient;
     private final String tempDirPath;
-    private final static String FILE_SEPARATOR = "/";
-    private final static String DOT = ".";
+    private static final String FILE_SEPARATOR = "/";
+    private static final String DOT = ".";
 
 
     @Override
