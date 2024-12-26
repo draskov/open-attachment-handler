@@ -5,7 +5,7 @@ public interface FileService {
 
     String getUploadingUrl(String fileName, String extension);
 
-    boolean move(String source, String destination);
+    void move(String source, String destination);
 
     void remove(String filePath);
 

@@ -12,7 +12,6 @@ import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,7 +45,7 @@ public class AzureStorageFileService implements FileService {
 
 
     @Override
-    public boolean move(String source, String destination) {
+    public void move(String source, String destination) {
         // Move blob from...
         BlobClient sourceBlob = blobContainerClient.getBlobClient(source);
 
@@ -62,7 +61,6 @@ public class AzureStorageFileService implements FileService {
             sourceBlob.delete();
         }
 
-        return copied;
     }
 
 
