@@ -12,6 +12,7 @@ import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,6 +21,8 @@ public class AzureStorageFileService implements FileService {
 
     private final BlobContainerClient blobContainerClient;
     private final String tempDirPath;
+    private final static String FILE_SEPARATOR = "/";
+    private final static String DOT = ".";
 
 
     @Override
@@ -106,6 +109,15 @@ public class AzureStorageFileService implements FileService {
     @Override
     public String getTempDir() {
         return tempDirPath;
+    }
+
+    @Override
+    public String generatePath(String fileName, String extension, String... folders) {
+        return String.join(FILE_SEPARATOR, folders)
+                + FILE_SEPARATOR
+                + fileName
+                + DOT
+                + extension;
     }
 
     private String generateSasPermissionToken(

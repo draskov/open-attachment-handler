@@ -6,5 +6,4 @@ import rs.pumpkin.open_attachment_handler.model.Attachment;
 
 public interface AbstractAttachmentMapperHelper<H,E extends AbstractAttachment<H>>{
     Attachment map(E attachment);
-    void updateAttachmentData(E attachment, E updateData);
 }
