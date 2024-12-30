@@ -28,21 +28,21 @@ import java.util.stream.Stream;
 @Data
 @RequiredArgsConstructor
 @Slf4j
-public class AttachmentService<H extends AttachmentHolder, A extends AbstractAttachment<H>> implements AttachmentServiceSpecification<A, H> {
+public class AttachmentService<A extends AbstractAttachment> implements AttachmentServiceSpecification<A> {
 
     protected final FileService fileService;
     protected final AttachmentRepository<A> attachmentRepository;
     protected final OpenAttachmentManagerProps openAttachmentManagerProps;
-    private final HolderService<H> holderService;
+    private final HolderService<? extends AttachmentHolder> holderService;
     private static final String DOWNLOAD_ENDPOINT = "url";
 
     @Override
-    public Set<A> updateAttachments(H holder, List<A> updateAttachmentList) {
+    public Set<A> updateAttachments(String holderId, List<A> updateAttachmentList) {
         if (updateAttachmentList == null) {
             return Collections.emptySet();
         }
 
-        List<A> existingAttachments = new ArrayList<>(findAllByHolder(holder));
+        List<A> existingAttachments = new ArrayList<>(findAllByHolderId(holderId));
         removeAttachments(existingAttachments, updateAttachmentList);
 
         List<A> inserted = insertAttachments(
@@ -174,9 +174,9 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
     }
 
     @Override
-    public Set<A> findAllByHolder(H holder) {
+    public Set<A> findAllByHolderId(String holderId) {
         return attachmentRepository
-                .findAllByHolder(holder.getHolderId())
+                .findAllByHolderId(holderId)
                 .stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
@@ -232,14 +232,14 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
 
     @Override
     public List<AttachmentContent> getAttachmentContentByHolderID(String holderId) {
-        H holder;
+        AttachmentHolder holder;
         try {
             holder = holderService.getHolder(holderId);
         } catch (RuntimeException runtimeException) {
             return Collections.emptyList();
         }
 
-        Set<A> existingAttachments = findAllByHolder(holder);
+        Set<A> existingAttachments = findAllByHolderId(holderId);
         return getAttachmentContentsByIds(
                 existingAttachments.stream()
                         .map(AbstractAttachment::getId)
@@ -262,11 +262,11 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
     }
 
     @Override
-    public void copy(Collection<H> sources, H target) {
+    public void copy(Collection<String> sourceIds, String targetId) {
         final List<A> attList = new ArrayList<>();
 
-        sources.forEach(source -> {
-            attachmentRepository.findAllByHolder(target.getHolderId())
+        sourceIds.forEach(source -> {
+            attachmentRepository.findAllByHolderId(targetId)
                     .stream()
                     .map(att -> (A) att.copy())
                     .forEach(attList::add);
@@ -274,7 +274,7 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
             attList.forEach(
                     att -> {
                         att.setId(UUID.randomUUID());
-                        att.setHolder(target);
+                        att.setHolderId(targetId);
                     }
             );
         });

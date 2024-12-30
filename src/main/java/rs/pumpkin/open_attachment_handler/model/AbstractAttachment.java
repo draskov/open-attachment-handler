@@ -3,7 +3,7 @@ package rs.pumpkin.open_attachment_handler.model;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface AbstractAttachment<H> {
+public interface AbstractAttachment {
      UUID getId();
 
      String getFileName();
@@ -12,15 +12,13 @@ public interface AbstractAttachment<H> {
 
      String getExtension();
 
-     H getHolder();
-
      void setId(UUID newValue);
 
-     void setFileName(String newValue);
+     void setFileName(String fileName);
 
-     void setExtension(String newValue);
+     void setExtension(String extension);
 
-     void setHolder(H newValue);
+     void setHolderId(String holderId);
 
      void setPath(String path);
 
@@ -28,5 +26,5 @@ public interface AbstractAttachment<H> {
 
      void setCreatedAt(Instant time);
 
-     AbstractAttachment<H> copy();
+     AbstractAttachment copy();
 }

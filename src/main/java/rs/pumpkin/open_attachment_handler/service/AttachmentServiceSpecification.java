@@ -2,7 +2,6 @@ package rs.pumpkin.open_attachment_handler.service;
 
 import rs.pumpkin.open_attachment_handler.model.AbstractAttachment;
 import rs.pumpkin.open_attachment_handler.model.AttachmentContent;
-import rs.pumpkin.open_attachment_handler.ports.AttachmentHolder;
 import rs.pumpkin.open_attachment_handler.storage.FileService;
 
 import java.net.URL;
@@ -11,11 +10,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public interface AttachmentServiceSpecification<A extends AbstractAttachment<H>, H extends AttachmentHolder> {
+public interface AttachmentServiceSpecification<A extends AbstractAttachment> {
 
-    Set<A> updateAttachments(H holder, List<A> linkAttachment);
+    Set<A> updateAttachments(String holderId, List<A> linkAttachment);
 
-    Set<A> findAllByHolder(H holder);
+    Set<A> findAllByHolderId(String holderId);
 
     Set<A> findByIds(Set<UUID> ids);
 
@@ -33,7 +32,7 @@ public interface AttachmentServiceSpecification<A extends AbstractAttachment<H>,
 
     String generateRelativePath(A attachment);
 
-    void copy(Collection<H> sources, H target);
+    void copy(Collection<String> sourceHolderIds, String targetHolderId);
 
     FileService getFileService();
 

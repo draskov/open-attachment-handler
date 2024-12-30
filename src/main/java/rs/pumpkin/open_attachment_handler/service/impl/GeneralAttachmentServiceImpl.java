@@ -16,10 +16,10 @@ import java.util.function.Supplier;
 @Slf4j
 public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
 
-    protected final List<AttachmentService<?, ?>> attachmentService;
+    protected final List<AttachmentService<?>> attachmentService;
 
     public GeneralAttachmentServiceImpl(
-            List<AttachmentService<?, ?>> attachmentService
+            List<AttachmentService<?>> attachmentService
     ) {
         this.attachmentService = attachmentService;
     }

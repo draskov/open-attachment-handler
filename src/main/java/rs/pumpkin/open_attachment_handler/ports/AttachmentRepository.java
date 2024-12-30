@@ -14,6 +14,6 @@ public interface AttachmentRepository<A> {
 
     void save(A attachment);
 
-    Collection<A> findAllByHolder(String holderId);
+    Collection<A> findAllByHolderId(String holderId);
 
 }
