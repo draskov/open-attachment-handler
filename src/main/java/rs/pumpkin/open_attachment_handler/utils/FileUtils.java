@@ -40,7 +40,7 @@ public class FileUtils {
         try {
             var zipOut = new ZipOutputStream(out);
             InputStream inputStream = null;
-            for(Map.Entry<String, InputStream> mapEntry : input.entrySet()){
+            for (Map.Entry<String, InputStream> mapEntry : input.entrySet()) {
                 fileName = mapEntry.getKey();
                 inputStream = mapEntry.getValue();
                 zipOut.putNextEntry(new ZipEntry(fileName));
@@ -49,7 +49,7 @@ public class FileUtils {
                 inputStream.close();
             }
             zipOut.close();
-        }catch (IOException ex){
+        } catch (IOException ex) {
             throw new InternalException(String.format(
                     "Error zipping file: %s Exception message: %s",
                     fileName,

@@ -1,4 +1,4 @@
-package rs.pumpkin.open_attachment_handler.service.impl;
+package rs.pumpkin.open_attachment_handler.storage.impl;
 
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobClient;
@@ -18,11 +18,10 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class AzureStorageFileService implements FileService {
 
-    private final BlobContainerClient blobContainerClient;
-    private final String tempDirPath;
     private static final String FILE_SEPARATOR = "/";
     private static final String DOT = ".";
-
+    private final BlobContainerClient blobContainerClient;
+    private final String tempDirPath;
 
     @Override
     public String getUploadingUrl(String fileName, String extension) {

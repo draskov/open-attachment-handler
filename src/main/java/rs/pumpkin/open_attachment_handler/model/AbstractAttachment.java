@@ -4,27 +4,27 @@ import java.time.Instant;
 import java.util.UUID;
 
 public interface AbstractAttachment {
-     UUID getId();
+    UUID getId();
 
-     String getFileName();
+    void setId(UUID newValue);
 
-     String getHolderId();
+    String getFileName();
 
-     String getExtension();
+    void setFileName(String fileName);
 
-     void setId(UUID newValue);
+    String getHolderId();
 
-     void setFileName(String fileName);
+    void setHolderId(String holderId);
 
-     void setExtension(String extension);
+    String getExtension();
 
-     void setHolderId(String holderId);
+    void setExtension(String extension);
 
-     void setPath(String path);
+    String getPath();
 
-     String getPath();
+    void setPath(String path);
 
-     void setCreatedAt(Instant time);
+    void setCreatedAt(Instant time);
 
-     AbstractAttachment copy();
+    AbstractAttachment copy();
 }

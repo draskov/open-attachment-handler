@@ -28,11 +28,15 @@ import java.util.stream.Stream;
 @Slf4j
 public class AttachmentService<A extends AbstractAttachment> implements AttachmentServiceSpecification<A> {
 
-    private final String name;
+    private static final String DOWNLOAD_ENDPOINT = "url";
     protected final FileService fileService;
     protected final AttachmentRepository<A> attachmentRepository;
     protected final OpenAttachmentManagerProps openAttachmentManagerProps;
-    private static final String DOWNLOAD_ENDPOINT = "url";
+    private final String name;
+
+    private static String getFileFullUrl(String id, String baseUrl) {
+        return baseUrl + DOWNLOAD_ENDPOINT + "?id=" + id;
+    }
 
     @Override
     public Set<A> updateAttachments(String holderId, List<A> updateAttachmentList) {
@@ -66,7 +70,6 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
         return new HashSet<>(attachmentRepository.findAllById(ids));
     }
 
-
     @Override
     public AttachmentContent getContentById(UUID id) {
         A attachment = attachmentRepository.findById(id)
@@ -80,7 +83,6 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
         attachmentContent.setByteArrayResource(byteArrayResource);
         return attachmentContent;
     }
-
 
     protected void moveAttachment(A attachment) {
         // Move Attachment from /tmp...
@@ -146,7 +148,6 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
         return toInsert;
     }
 
-
     @Override
     public URL getUrl(A attachment) {
         String fileFullUrl;
@@ -166,10 +167,6 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
             e.printStackTrace();
         }
         return null;
-    }
-
-    private static String getFileFullUrl(String id, String baseUrl) {
-        return baseUrl + DOWNLOAD_ENDPOINT + "?id=" + id;
     }
 
     @Override

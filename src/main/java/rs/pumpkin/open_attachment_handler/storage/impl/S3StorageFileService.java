@@ -1,4 +1,4 @@
-package rs.pumpkin.open_attachment_handler.service.impl;
+package rs.pumpkin.open_attachment_handler.storage.impl;
 
 import rs.pumpkin.open_attachment_handler.storage.FileService;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -20,14 +20,14 @@ import java.time.Duration;
 
 public class S3StorageFileService implements FileService {
 
+    private static final String FILE_SEPARATOR = "/";
+    private static final String DOT = ".";
     private final S3Client client;
     private final String tempDirPath;
     private final String bucketName;
     private final Region region;
     private final URI endpoint;
     private final StaticCredentialsProvider credentialsProvider;
-    private static final String FILE_SEPARATOR = "/";
-    private static final String DOT = ".";
 
 
     public S3StorageFileService(
@@ -52,7 +52,6 @@ public class S3StorageFileService implements FileService {
         this.tempDirPath = tempDirPath;
         this.bucketName = bucketName;
     }
-
 
 
     @Override
@@ -143,7 +142,7 @@ public class S3StorageFileService implements FileService {
 
         } catch (Exception e) {
             System.err.println("Error generating pre-signed URL: " + e.getMessage());
-           throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 

@@ -8,6 +8,7 @@ public class InternalException extends AttachmentLibraryBaseException {
     public InternalException(Throwable cause) {
         super(cause);
     }
+
     public InternalException(String message, Throwable cause) {
         super(message, cause);
     }

@@ -1,7 +1,7 @@
 package rs.pumpkin.open_attachment_handler.exception;
 
 
-public class AttachmentNotFoundException extends AttachmentLibraryBaseException{
+public class AttachmentNotFoundException extends AttachmentLibraryBaseException {
 
     public AttachmentNotFoundException(String message) {
         super(message);

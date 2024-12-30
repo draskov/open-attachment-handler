@@ -3,7 +3,7 @@ package rs.pumpkin.open_attachment_handler.exception;
 import lombok.Getter;
 
 @Getter
-public class AttachmentLibraryBaseException extends RuntimeException{
+public class AttachmentLibraryBaseException extends RuntimeException {
 
 
     public AttachmentLibraryBaseException(String message) {

@@ -24,6 +24,10 @@ public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
         this.attachmentService = attachmentService;
     }
 
+    private static Supplier<IllegalStateException> getIllegalStateExceptionSupplier() {
+        return () -> new IllegalStateException("There is no available Attachment services.");
+    }
+
     @Override
     public AttachmentParams getUploadParameters(
             String holderName,
@@ -106,9 +110,5 @@ public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
                 .findFirst()
                 .orElseThrow(getIllegalStateExceptionSupplier())
                 .getAttachmentContentByHolderID(holderId);
-    }
-
-    private static Supplier<IllegalStateException> getIllegalStateExceptionSupplier() {
-        return () -> new IllegalStateException("There is no available Attachment services.");
     }
 }

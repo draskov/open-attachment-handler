@@ -22,13 +22,12 @@ public enum AllowedFileType {
     MSG("application/vnd.ms-outlook"),
     PDF("application/pdf");
 
-    @Getter
-    private final String contentType;
-
     private static final Map<String, AllowedFileType> VALUE_MAP = Arrays.stream(values()).collect(Collectors.toMap(
             en -> en.name().toLowerCase(),
             Function.identity()
     ));
+    @Getter
+    private final String contentType;
 
     public static AllowedFileType from(String extension) {
         return VALUE_MAP.get(extension);
