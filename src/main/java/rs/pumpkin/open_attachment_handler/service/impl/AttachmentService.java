@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 public class AttachmentService<H extends AttachmentHolder, A extends AbstractAttachment<H>> implements AttachmentServiceSpecification<A, H> {
 
     protected final FileService fileService;
-    protected final AttachmentRepository<A, H> attachmentRepository;
+    protected final AttachmentRepository<A> attachmentRepository;
     protected final OpenAttachmentManagerProps openAttachmentManagerProps;
     private final HolderService<H> holderService;
     private static final String DOWNLOAD_ENDPOINT = "url";
@@ -176,7 +176,7 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
     @Override
     public Set<A> findAllByHolder(H holder) {
         return attachmentRepository
-                .findAllByHolder(holder)
+                .findAllByHolder(holder.getHolderId())
                 .stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
@@ -266,7 +266,7 @@ public class AttachmentService<H extends AttachmentHolder, A extends AbstractAtt
         final List<A> attList = new ArrayList<>();
 
         sources.forEach(source -> {
-            attachmentRepository.findAllByHolder(source)
+            attachmentRepository.findAllByHolder(target.getHolderId())
                     .stream()
                     .map(att -> (A) att.copy())
                     .forEach(attList::add);
