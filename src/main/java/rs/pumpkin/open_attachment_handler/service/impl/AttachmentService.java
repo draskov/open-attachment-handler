@@ -11,10 +11,8 @@ import rs.pumpkin.open_attachment_handler.exception.ExternalServiceException;
 import rs.pumpkin.open_attachment_handler.exception.InternalException;
 import rs.pumpkin.open_attachment_handler.model.AbstractAttachment;
 import rs.pumpkin.open_attachment_handler.model.AttachmentContent;
-import rs.pumpkin.open_attachment_handler.ports.AttachmentHolder;
 import rs.pumpkin.open_attachment_handler.ports.AttachmentRepository;
 import rs.pumpkin.open_attachment_handler.service.AttachmentServiceSpecification;
-import rs.pumpkin.open_attachment_handler.service.HolderService;
 import rs.pumpkin.open_attachment_handler.storage.FileService;
 
 import java.net.MalformedURLException;
@@ -30,10 +28,10 @@ import java.util.stream.Stream;
 @Slf4j
 public class AttachmentService<A extends AbstractAttachment> implements AttachmentServiceSpecification<A> {
 
+    private final String name;
     protected final FileService fileService;
     protected final AttachmentRepository<A> attachmentRepository;
     protected final OpenAttachmentManagerProps openAttachmentManagerProps;
-    private final HolderService<? extends AttachmentHolder> holderService;
     private static final String DOWNLOAD_ENDPOINT = "url";
 
     @Override
@@ -41,6 +39,7 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
         if (updateAttachmentList == null) {
             return Collections.emptySet();
         }
+        updateAttachmentList.forEach(attachment -> attachment.setHolderId(holderId));
 
         List<A> existingAttachments = new ArrayList<>(findAllByHolderId(holderId));
         removeAttachments(existingAttachments, updateAttachmentList);
@@ -232,13 +231,6 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
 
     @Override
     public List<AttachmentContent> getAttachmentContentByHolderID(String holderId) {
-        AttachmentHolder holder;
-        try {
-            holder = holderService.getHolder(holderId);
-        } catch (RuntimeException runtimeException) {
-            return Collections.emptyList();
-        }
-
         Set<A> existingAttachments = findAllByHolderId(holderId);
         return getAttachmentContentsByIds(
                 existingAttachments.stream()
@@ -254,6 +246,7 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
                 fileService.generatePath(
                         attachment.getId().toString(),
                         attachment.getExtension(),
+                        this.name,
                         attachment.getHolderId()
                 )
         );
@@ -284,6 +277,6 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
 
     @Override
     public String getHolderName() {
-        return holderService.getHolderName();
+        return name;
     }
 }
