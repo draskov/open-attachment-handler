@@ -45,7 +45,7 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
         }
         updateAttachmentList.forEach(attachment -> attachment.setHolderId(holderId));
 
-        List<A> existingAttachments = new ArrayList<>(findAllByHolderId(holderId));
+        List<A> existingAttachments = new ArrayList<>(findAllByHolder(holderId));
         removeAttachments(existingAttachments, updateAttachmentList);
 
         List<A> inserted = insertAttachments(
@@ -170,9 +170,9 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
     }
 
     @Override
-    public Set<A> findAllByHolderId(String holderId) {
+    public Set<A> findAllByHolder(String holderId) {
         return attachmentRepository
-                .findAllByHolderId(holderId)
+                .findAllByHolderNameAndHolderId(name, holderId)
                 .stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
@@ -228,7 +228,7 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
 
     @Override
     public List<AttachmentContent> getAttachmentContentByHolderID(String holderId) {
-        Set<A> existingAttachments = findAllByHolderId(holderId);
+        Set<A> existingAttachments = findAllByHolder(holderId);
         return getAttachmentContentsByIds(
                 existingAttachments.stream()
                         .map(AbstractAttachment::getId)
@@ -252,11 +252,11 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
     }
 
     @Override
-    public void copy(Collection<String> sourceIds, String targetId) {
+    public void copy(String holderName, Collection<String> sourceIds, String targetId) {
         final List<A> attList = new ArrayList<>();
 
         sourceIds.forEach(source -> {
-            attachmentRepository.findAllByHolderId(targetId)
+            attachmentRepository.findAllByHolderNameAndHolderId(holderName, targetId)
                     .stream()
                     .map(att -> (A) att.copy())
                     .forEach(attList::add);

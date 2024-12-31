@@ -16,6 +16,10 @@ public interface AbstractAttachment {
 
     void setHolderId(String holderId);
 
+    String getHolderName();
+
+    void setHolderName(String holderName);
+
     String getExtension();
 
     void setExtension(String extension);

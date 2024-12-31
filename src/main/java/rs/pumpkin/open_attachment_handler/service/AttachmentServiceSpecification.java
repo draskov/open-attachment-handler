@@ -14,7 +14,7 @@ public interface AttachmentServiceSpecification<A extends AbstractAttachment> {
 
     Set<A> updateAttachments(String holderId, List<A> linkAttachment);
 
-    Set<A> findAllByHolderId(String holderId);
+    Set<A> findAllByHolder(String holderId);
 
     Set<A> findByIds(Set<UUID> ids);
 
@@ -32,7 +32,7 @@ public interface AttachmentServiceSpecification<A extends AbstractAttachment> {
 
     String generateRelativePath(A attachment);
 
-    void copy(Collection<String> sourceHolderIds, String targetHolderId);
+    void copy(String holderName, Collection<String> sourceHolderIds, String targetHolderId);
 
     FileService getFileService();
 
