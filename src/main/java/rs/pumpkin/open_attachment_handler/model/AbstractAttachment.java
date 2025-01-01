@@ -1,5 +1,6 @@
 package rs.pumpkin.open_attachment_handler.model;
 
+import java.net.URL;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -31,4 +32,8 @@ public interface AbstractAttachment {
     void setCreatedAt(Instant time);
 
     AbstractAttachment copy();
+
+    void setUrl(URL url);
+
+    URL getUrl();
 }

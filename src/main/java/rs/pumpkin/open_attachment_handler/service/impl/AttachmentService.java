@@ -28,22 +28,20 @@ import java.util.stream.Stream;
 @Slf4j
 public class AttachmentService<A extends AbstractAttachment> implements AttachmentServiceSpecification<A> {
 
-    private static final String DOWNLOAD_ENDPOINT = "url";
     protected final FileService fileService;
     protected final AttachmentRepository<A> attachmentRepository;
     protected final OpenAttachmentManagerProps openAttachmentManagerProps;
-    private final String name;
-
-    private static String getFileFullUrl(String id, String baseUrl) {
-        return baseUrl + DOWNLOAD_ENDPOINT + "?id=" + id;
-    }
+    private final String holderName;
 
     @Override
     public Set<A> updateAttachments(String holderId, List<A> updateAttachmentList) {
         if (updateAttachmentList == null) {
             return Collections.emptySet();
         }
-        updateAttachmentList.forEach(attachment -> attachment.setHolderId(holderId));
+        updateAttachmentList.forEach(attachment -> {
+            attachment.setHolderId(holderId);
+            attachment.setHolderName(holderName);
+        });
 
         List<A> existingAttachments = new ArrayList<>(findAllByHolder(holderId));
         removeAttachments(existingAttachments, updateAttachmentList);
@@ -62,12 +60,18 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
                 .forEach(attachmentRepository::save);
 
         return Stream.of(existingAttachments, inserted)
-                .flatMap(Collection::stream).collect(Collectors.toSet());
+                .flatMap(Collection::stream)
+                .peek(a -> a.setUrl(getUrl(a)))
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<A> findByIds(Set<UUID> ids) {
-        return new HashSet<>(attachmentRepository.findAllById(ids));
+        return new HashSet<>(
+                attachmentRepository.findAllById(ids).stream()
+                        .peek(a -> a.setUrl(getUrl(a)))
+                        .toList()
+        );
     }
 
     @Override
@@ -172,9 +176,10 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
     @Override
     public Set<A> findAllByHolder(String holderId) {
         return attachmentRepository
-                .findAllByHolderNameAndHolderId(name, holderId)
+                .findAllByHolderNameAndHolderId(holderName, holderId)
                 .stream()
                 .filter(Objects::nonNull)
+                .peek(a -> a.setUrl(getUrl(a)))
                 .collect(Collectors.toSet());
     }
 
@@ -243,7 +248,7 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
                 fileService.generatePath(
                         attachment.getId().toString(),
                         attachment.getExtension(),
-                        this.name,
+                        this.holderName,
                         attachment.getHolderId()
                 )
         );
@@ -274,6 +279,10 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
 
     @Override
     public String getHolderName() {
-        return name;
+        return holderName;
+    }
+
+    private String getFileFullUrl(String id, String baseUrl) {
+        return baseUrl + "?id=" + id;
     }
 }
