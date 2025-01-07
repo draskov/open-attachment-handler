@@ -1,4 +1,4 @@
-package com.computerrock.attachmentmanager.model.enums;
+package rs.pumpkin.open_attachment_handler.model.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

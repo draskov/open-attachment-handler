@@ -82,10 +82,10 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
                 ));
         byte[] byteArrayResource = fileService.getFileContent(attachment.getPath());
 
-        AttachmentContent attachmentContent = new AttachmentContent();
-        attachmentContent.setFileName(attachment.getFileName());
-        attachmentContent.setByteArrayResource(byteArrayResource);
-        return attachmentContent;
+        return new AttachmentContent(
+                attachment.getFileName(),
+                byteArrayResource
+        );
     }
 
     protected void moveAttachment(A attachment) {
