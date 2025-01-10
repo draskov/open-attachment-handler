@@ -108,12 +108,7 @@ under the License.
      | This is a list of authentication profiles, keyed by the server-id used within the system.
      | Authentication profiles can be used whenever maven must make a connection to a remote server.
      |-->
-    <servers>
-        <server>
-            <id>github-maven</id>
-            <username>draskov</username>
-            <password>${{ secrets.DEPLOY_TOKEN }}</password>
-        </server>
+
 
         <!-- server
          | Specifies the authentication information to use when connecting to a particular server, identified by
