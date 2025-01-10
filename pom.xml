@@ -66,17 +66,10 @@
     </repositories>
     <distributionManagement>
         <repository>
-            <id>gitlab-maven</id>
-            <url>https://gitlab.computerrock.com/api/v4/projects/134/packages/maven</url>
-        </repository>
-        <repository>
              <id>github-maven</id>
              <url>https://maven.pkg.github.com/draskov/open-attachment-handler</url>
         </repository>
-        <snapshotRepository>
-            <id>gitlab-maven</id>
-            <url>https://gitlab.computerrock.com/api/v4/projects/134/packages/maven</url>
-        </snapshotRepository>
+             
         <snapshotRepository>
             <id>github-maven</id>
             <url>https://maven.pkg.github.com/draskov/open-attachment-handler</url>
