@@ -67,12 +67,12 @@
     <distributionManagement>
         <repository>
              <id>github-maven</id>
-             <url>https://maven.pkg.github.com/jaomile/open-attachment-handler</url>
+             <url>https://maven.pkg.github.com/draskov/open-attachment-handler</url>
         </repository>
              
         <snapshotRepository>
             <id>github-maven</id>
-            <url>https://maven.pkg.github.com/jaomile/open-attachment-handler</url>
+            <url>https://maven.pkg.github.com/draskov/open-attachment-handler</url>
         </snapshotRepository>
     </distributionManagement>
 
