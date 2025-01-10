@@ -5,7 +5,7 @@
 
     <groupId>rs.pumpkin</groupId>
     <artifactId>open-attachment-handler</artifactId>
-    <version>0.9.1</version>
+    <version>0.9.3</version>
     <name>open attachment handler</name>
     <description>Library for easy handling of attachments</description>
     <packaging>jar</packaging>
