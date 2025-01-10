@@ -111,8 +111,8 @@ under the License.
     <servers>
         <server>
             <id>github-maven</id>
-            <username>jaomile</username>
-            <password>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</password>
+            <username>draskov</username>
+            <password>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</password>
         </server>
         <server>
             <id>gitlab-maven</id>
