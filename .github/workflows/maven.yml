@@ -3,7 +3,7 @@ name: Build and Publish
 on:
   push:
     branches:
-      - feature_workflow
+      - main
 
 jobs:
   build:
