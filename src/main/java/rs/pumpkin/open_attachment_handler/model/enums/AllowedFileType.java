@@ -14,6 +14,7 @@ public enum AllowedFileType {
     JPG("image/jpeg"),
     JPEG("image/jpeg"),
     PNG("image/png"),
+    SVG("image/svg+xml"),
     XLS("application/vnd.ms-excel"),
     XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
     DOC("application/msword"),
