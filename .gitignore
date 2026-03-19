@@ -1,0 +1,15 @@
+.DS_Store
+.gradle
+.idea
+build
+classes
+target
+out
+tmp
+generated-sources
+*.iml
+*.iws
+*.ipr
+src/main/resources/application-dev.yml
+src/main/resources/fcm.json
+/logs/**
