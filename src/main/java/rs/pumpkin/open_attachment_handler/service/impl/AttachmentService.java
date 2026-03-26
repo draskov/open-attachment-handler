@@ -55,9 +55,9 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
                 .map(AbstractAttachment::getId)
                 .collect(Collectors.toSet());
 
-        updateAttachmentList.stream()
-                .filter(l -> existingUUIDs.contains(l.getId()))
-                .forEach(attachmentRepository::save);
+        // updateAttachmentList.stream()
+        //         .filter(l -> existingUUIDs.contains(l.getId()))
+        //         .forEach(attachmentRepository::save);
 
         return Stream.of(existingAttachments, inserted)
                 .flatMap(Collection::stream)
