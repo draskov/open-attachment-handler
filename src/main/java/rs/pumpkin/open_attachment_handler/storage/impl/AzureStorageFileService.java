@@ -7,6 +7,7 @@ import com.azure.storage.blob.sas.BlobContainerSasPermission;
 import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.azure.storage.common.sas.SasProtocol;
 import lombok.RequiredArgsConstructor;
+import rs.pumpkin.open_attachment_handler.exception.InvalidFileTypeException;
 import rs.pumpkin.open_attachment_handler.model.enums.AllowedFileType;
 import rs.pumpkin.open_attachment_handler.storage.FileService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
@@ -119,6 +120,13 @@ public class AzureStorageFileService implements FileService {
     private String generateSasPermissionToken(
             String blobName, boolean read, boolean write
     ) {
+        AllowedFileType allowedFileType = AllowedFileType.from(FileUtils.getExtension(blobName));
+        if (allowedFileType == null) {
+            throw new InvalidFileTypeException(String.format(
+                    "File extension '%s' is not supported for Azure blob access.",
+                    FileUtils.getExtension(blobName)
+            ));
+        }
 
         BlobContainerSasPermission blobContainerSasPermission = new BlobContainerSasPermission()
                 .setReadPermission(read)
@@ -128,9 +136,7 @@ public class AzureStorageFileService implements FileService {
                 OffsetDateTime.now().plusMinutes(10),
                 blobContainerSasPermission
         )
-                .setContentType(AllowedFileType.from(
-                        FileUtils.getExtension(blobName)
-                ).getContentType())
+                .setContentType(allowedFileType.getContentType())
                 .setProtocol(SasProtocol.HTTPS_ONLY);
 
         return blobContainerClient

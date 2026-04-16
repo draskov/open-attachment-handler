@@ -2,6 +2,7 @@ package rs.pumpkin.open_attachment_handler.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import rs.pumpkin.open_attachment_handler.exception.InvalidFileTypeException;
 import rs.pumpkin.open_attachment_handler.exception.InternalException;
 
 import java.io.IOException;
@@ -18,6 +19,12 @@ public class FileUtils {
     private static final String DUPLICATE_FILE_NAME_EXTENSION_FORMAT = DUPLICATE_FILE_NAME_BASE_FORMAT + ".%s";
 
     public static String getExtension(String filename) {
+        if (!haveExtension(filename)) {
+            throw new InvalidFileTypeException(String.format(
+                    "File '%s' does not have an extension.",
+                    filename
+            ));
+        }
         return filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
     }
 
@@ -32,7 +39,10 @@ public class FileUtils {
     }
 
     public static boolean haveExtension(String fileName) {
-        return fileName.lastIndexOf(".") > -1;
+        return fileName != null
+                && !fileName.isBlank()
+                && fileName.lastIndexOf(".") > -1
+                && fileName.lastIndexOf(".") < fileName.length() - 1;
     }
 
     public static <T extends OutputStream> T zipFiles(Map<String, InputStream> input, T out) {

@@ -2,11 +2,14 @@ package rs.pumpkin.open_attachment_handler.service.impl;
 
 import com.azure.storage.blob.models.BlobStorageException;
 import lombok.extern.slf4j.Slf4j;
+import rs.pumpkin.open_attachment_handler.OpenAttachmentManagerProps;
 import rs.pumpkin.open_attachment_handler.exception.AttachmentNotFoundException;
 import rs.pumpkin.open_attachment_handler.exception.ExternalServiceException;
+import rs.pumpkin.open_attachment_handler.exception.InvalidFileTypeException;
 import rs.pumpkin.open_attachment_handler.exception.InternalException;
 import rs.pumpkin.open_attachment_handler.model.AttachmentContent;
 import rs.pumpkin.open_attachment_handler.model.AttachmentParams;
+import rs.pumpkin.open_attachment_handler.model.enums.AllowedFileType;
 import rs.pumpkin.open_attachment_handler.service.GeneralAttachmentService;
 import rs.pumpkin.open_attachment_handler.utils.FileUtils;
 
@@ -17,11 +20,20 @@ import java.util.function.Supplier;
 public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
 
     protected final List<AttachmentService<?>> attachmentService;
+    protected final OpenAttachmentManagerProps openAttachmentManagerProps;
 
     public GeneralAttachmentServiceImpl(
             List<AttachmentService<?>> attachmentService
     ) {
+        this(attachmentService, new OpenAttachmentManagerProps());
+    }
+
+    public GeneralAttachmentServiceImpl(
+            List<AttachmentService<?>> attachmentService,
+            OpenAttachmentManagerProps openAttachmentManagerProps
+    ) {
         this.attachmentService = attachmentService;
+        this.openAttachmentManagerProps = openAttachmentManagerProps;
     }
 
     private static Supplier<IllegalStateException> getIllegalStateExceptionSupplier() {
@@ -34,6 +46,7 @@ public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
             String fileName
     ) {
         String extension = FileUtils.getExtension(fileName);
+        validateUploadExtension(extension);
         String id = UUID.randomUUID().toString();
 
         final String attachmentUploadingUrl = attachmentService.stream()
@@ -47,6 +60,36 @@ public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
                 .id(id)
                 .url(attachmentUploadingUrl)
                 .build();
+    }
+
+    private void validateUploadExtension(String extension) {
+        if (!AllowedFileType.supports(extension)) {
+            throw new InvalidFileTypeException(String.format(
+                    "File extension '%s' is not supported. Supported extensions are: %s",
+                    extension,
+                    String.join(", ", new TreeSet<>(AllowedFileType.getExtensions()))
+            ));
+        }
+
+        Set<String> configuredAllowedTypes = Optional.ofNullable(openAttachmentManagerProps)
+                .map(OpenAttachmentManagerProps::getAllowedFileTypes)
+                .filter(allowedTypes -> !allowedTypes.isEmpty())
+                .orElse(AllowedFileType.getExtensions());
+
+        boolean allowed = configuredAllowedTypes.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(value -> !value.isEmpty())
+                .map(String::toLowerCase)
+                .anyMatch(extension::equals);
+
+        if (!allowed) {
+            throw new InvalidFileTypeException(String.format(
+                    "File extension '%s' is not allowed for upload. Allowed extensions are: %s",
+                    extension,
+                    String.join(", ", new TreeSet<>(configuredAllowedTypes))
+            ));
+        }
     }
 
     @Override
