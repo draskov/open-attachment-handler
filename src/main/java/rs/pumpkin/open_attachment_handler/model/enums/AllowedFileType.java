@@ -14,6 +14,7 @@ public enum AllowedFileType {
     JPG("image/jpeg"),
     JPEG("image/jpeg"),
     PNG("image/png"),
+    HEIC("image/heic"),
     STL("model/stl"),
     OBJ("model/obj"),
     PLY("application/octet-stream"),
