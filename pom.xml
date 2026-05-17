@@ -5,7 +5,7 @@
 
     <groupId>rs.pumpkin</groupId>
     <artifactId>open-attachment-handler</artifactId>
-    <version>0.11.0</version>
+    <version>0.11.1</version>
     <name>open attachment handler</name>
     <description>Library for easy handling of attachments</description>
     <packaging>jar</packaging>
@@ -49,6 +49,13 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
             <version>2.29.43</version>
+        </dependency>
+
+        <!-- Reads EXIF metadata (e.g. image orientation) that the JDK's ImageIO ignores -->
+        <dependency>
+            <groupId>com.drewnoakes</groupId>
+            <artifactId>metadata-extractor</artifactId>
+            <version>2.19.0</version>
         </dependency>
 
     </dependencies>

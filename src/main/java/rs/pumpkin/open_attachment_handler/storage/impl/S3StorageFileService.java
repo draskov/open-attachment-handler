@@ -5,6 +5,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
@@ -14,8 +15,6 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 
 public class S3StorageFileService implements FileService {
@@ -171,8 +170,7 @@ public class S3StorageFileService implements FileService {
                 .key(filePath)
                 .build();
 
-        Path path = Paths.get(filePath);
-        client.putObject(putRequest, path);
+        client.putObject(putRequest, RequestBody.fromBytes(file));
     }
 
     @Override

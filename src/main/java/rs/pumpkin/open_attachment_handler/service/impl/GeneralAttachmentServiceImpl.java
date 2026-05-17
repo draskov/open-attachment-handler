@@ -166,6 +166,80 @@ public class GeneralAttachmentServiceImpl implements GeneralAttachmentService {
     }
 
     @Override
+    public List<String> generateResizedCopies(UUID id) {
+        return attachmentService.stream()
+                .map(service -> {
+                    try {
+                        return service.generateResizedCopies(id);
+                    } catch (AttachmentNotFoundException notFoundException) {
+                        log.trace("Service with name {} encountered not found exception with message: {}",
+                                service.getClass().getName(),
+                                notFoundException.getMessage(),
+                                notFoundException);
+                        return null;
+                    } catch (BlobStorageException ex) {
+                        log.error("Encountered exception while generating resized copies for id {}. Exception message: {}",
+                                id,
+                                ex.getMessage(),
+                                ex
+                        );
+                        throw new ExternalServiceException(
+                                String.format("Encountered exception while generating resized copies for id %s. Exception message: %s",
+                                        id, ex.getMessage()),
+                                ex);
+                    } catch (RuntimeException ex) {
+                        throw new InternalException(
+                                String.format(
+                                        "Something went wrong when generating resized copies for Attachment with id: %s. Exception message: %s",
+                                        id, ex.getMessage()),
+                                ex);
+                    }
+                })
+                .filter(Objects::nonNull)
+                .findFirst().orElseThrow(() -> new AttachmentNotFoundException(
+                        String.format("Attachment with id %s is not found", id)
+                ));
+    }
+
+    @Override
+    public String getResizedContentUrlById(UUID id, String variantName) {
+        return attachmentService.stream()
+                .map(service -> {
+                    try {
+                        return service.getResizedContentUrlById(id, variantName);
+                    } catch (AttachmentNotFoundException notFoundException) {
+                        log.trace("Service with name {} encountered not found exception with message: {}",
+                                service.getClass().getName(),
+                                notFoundException.getMessage(),
+                                notFoundException);
+                        return null;
+                    } catch (BlobStorageException ex) {
+                        log.error("Encountered exception while generating resized download url with id {}. Exception message: {}",
+                                id,
+                                ex.getMessage(),
+                                ex
+                        );
+                        throw new ExternalServiceException(
+                                String.format("Encountered exception while generating resized download url with id %s. Exception message: %s",
+                                        id, ex.getMessage()),
+                                ex);
+                    } catch (IllegalArgumentException ex) {
+                        throw ex;
+                    } catch (RuntimeException ex) {
+                        throw new InternalException(
+                                String.format(
+                                        "Something went wrong when generating resized download url for Attachment with id: %s. Exception message: %s",
+                                        id, ex.getMessage()),
+                                ex);
+                    }
+                })
+                .filter(Objects::nonNull)
+                .findFirst().orElseThrow(() -> new AttachmentNotFoundException(
+                        String.format("Attachment with id %s is not found", id)
+                ));
+    }
+
+    @Override
     public List<AttachmentContent> getContentsByIds(Set<UUID> ids) {
         if (attachmentService.isEmpty()) {
             throw new IllegalStateException("There is no available Attachment services.");

@@ -22,6 +22,10 @@ public interface AttachmentServiceSpecification<A extends AbstractAttachment> {
 
     String getContentUrlById(UUID id);
 
+    List<String> generateResizedCopies(UUID id);
+
+    String getResizedContentUrlById(UUID id, String variantName);
+
     URL getUrl(A attachment);
 
     void upload(A attachment, byte[] resource);

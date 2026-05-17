@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn -q test)",
+      "Bash(/usr/libexec/java_home -V)",
+      "Bash(/usr/libexec/java_home -v 21)",
+      "Bash(export JAVA_HOME=$\\(/usr/libexec/java_home -v 21\\))",
+      "Bash(./mvnw -q -s settings.xml test)",
+      "Bash(\"/Applications/IntelliJ IDEA.app/Contents/plugins/maven/lib/maven3/bin/mvn\" -q -s settings.xml test)",
+      "Bash(\"/Applications/IntelliJ IDEA.app/Contents/plugins/maven/lib/maven3/bin/mvn\" -q test)",
+      "Read(//Users/draskovrucinic/.m2/repository/org/assertj/assertj-core/**)",
+      "Read(//Users/draskovrucinic/.m2/repository/org/mockito/mockito-core/**)",
+      "Bash(\"/Applications/IntelliJ IDEA.app/Contents/plugins/maven/lib/maven3/bin/mvn\" -q clean test)"
+    ]
+  }
+}

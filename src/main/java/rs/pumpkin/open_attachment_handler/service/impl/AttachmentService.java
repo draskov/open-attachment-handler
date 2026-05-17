@@ -15,6 +15,10 @@ import rs.pumpkin.open_attachment_handler.ports.AttachmentRepository;
 import rs.pumpkin.open_attachment_handler.service.AttachmentServiceSpecification;
 import rs.pumpkin.open_attachment_handler.storage.FileService;
 
+
+import rs.pumpkin.open_attachment_handler.utils.ImageUtils;
+
+
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -96,6 +100,84 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
                 ));
 
         return fileService.getDownloadUrl(attachment.getPath());
+    }
+
+    @Override
+    public List<String> generateResizedCopies(UUID id) {
+        A attachment = attachmentRepository.findById(id)
+                .orElseThrow(() -> new AttachmentNotFoundException(
+                        String.format("Attachment with id %s is not found", id)
+                ));
+
+        if (!ImageUtils.isResizable(attachment.getExtension())) {
+            log.trace("Attachment {} with extension {} is not a resizable image; skipping.",
+                    id, attachment.getExtension());
+            return Collections.emptyList();
+        }
+
+        List<OpenAttachmentManagerProps.ImageVariant> variants = configuredImageVariants();
+        if (variants.isEmpty()) {
+            log.trace("No image variants configured; nothing to generate for attachment {}.", id);
+            return Collections.emptyList();
+        }
+
+        byte[] original = fileService.getFileContent(attachment.getPath());
+
+        List<String> generated = new ArrayList<>();
+        for (OpenAttachmentManagerProps.ImageVariant variant : variants) {
+            byte[] resized = ImageUtils.resizeToSquare(
+                    original, attachment.getExtension(), variant.getSize()
+            );
+            fileService.save(resized, resizedPath(attachment.getPath(), variant.getName()));
+            generated.add(variant.getName());
+        }
+        return generated;
+    }
+
+    @Override
+    public String getResizedContentUrlById(UUID id, String variantName) {
+        A attachment = attachmentRepository.findById(id)
+                .orElseThrow(() -> new AttachmentNotFoundException(
+                        String.format("Attachment with id %s is not found", id)
+                ));
+
+        OpenAttachmentManagerProps.ImageVariant variant = configuredImageVariants().stream()
+                .filter(v -> v.getName().equals(variantName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(String.format(
+                        "Image variant '%s' is not configured.", variantName
+                )));
+
+        return fileService.getDownloadUrl(resizedPath(attachment.getPath(), variant.getName()));
+    }
+
+    private List<OpenAttachmentManagerProps.ImageVariant> configuredImageVariants() {
+        OpenAttachmentManagerProps.ImageResizing imageResizing = openAttachmentManagerProps.getImageResizing();
+        if (imageResizing == null
+                || !Boolean.TRUE.equals(imageResizing.getEnabled())
+                || imageResizing.getVariants() == null) {
+            return Collections.emptyList();
+        }
+        return imageResizing.getVariants().stream()
+                .filter(v -> v != null
+                        && v.getName() != null && !v.getName().isBlank()
+                        && v.getSize() != null && v.getSize() > 0)
+                .toList();
+    }
+
+    /**
+     * Derives the storage key of a resized variant from the original object's key by
+     * inserting {@code _variantName} before the extension, so variants live next to
+     * the original (e.g. {@code holder/id.jpg} -> {@code holder/id_thumbnail.jpg}).
+     */
+    private String resizedPath(String originalPath, String variantName) {
+        int dotIndex = originalPath.lastIndexOf('.');
+        if (dotIndex < 0) {
+            return originalPath + "_" + variantName;
+        }
+        return originalPath.substring(0, dotIndex)
+                + "_" + variantName
+                + originalPath.substring(dotIndex);
     }
 
     protected void moveAttachment(A attachment) {
