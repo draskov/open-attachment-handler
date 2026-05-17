@@ -88,6 +88,16 @@ public class AttachmentService<A extends AbstractAttachment> implements Attachme
         );
     }
 
+    @Override
+    public String getContentUrlById(UUID id) {
+        A attachment = attachmentRepository.findById(id)
+                .orElseThrow(() -> new AttachmentNotFoundException(
+                        String.format("Attachment with id %s is not found", id)
+                ));
+
+        return fileService.getDownloadUrl(attachment.getPath());
+    }
+
     protected void moveAttachment(A attachment) {
         // Move Attachment from /tmp...
         String sourcePath =

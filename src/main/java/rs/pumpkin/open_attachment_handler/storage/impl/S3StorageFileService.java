@@ -117,6 +117,11 @@ public class S3StorageFileService implements FileService {
 
     @Override
     public String getFileFullUrl(String fileName, String extension, String... dirs) {
+        return getDownloadUrl(generatePath(fileName, extension, dirs));
+    }
+
+    @Override
+    public String getDownloadUrl(String filePath) {
 
         try (S3Presigner preSigner = S3Presigner.builder()
                 .endpointOverride(endpoint)
@@ -127,7 +132,7 @@ public class S3StorageFileService implements FileService {
             // Create a GetObjectRequest
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(generatePath(fileName, extension, dirs))
+                    .key(filePath)
                     .build();
 
             // Create a PresignRequest with an expiration time

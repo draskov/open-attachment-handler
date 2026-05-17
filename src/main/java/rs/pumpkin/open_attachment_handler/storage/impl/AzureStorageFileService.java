@@ -81,12 +81,18 @@ public class AzureStorageFileService implements FileService {
 
         var blobName = path + DOT + extension;
 
+        return getDownloadUrl(blobName);
+    }
+
+    @Override
+    public String getDownloadUrl(String filePath) {
+
         final var url = blobContainerClient
-                .getBlobClient(blobName)
+                .getBlobClient(filePath)
                 .getBlobUrl();
 
         final var token = generateSasPermissionToken(
-                blobName, true, false
+                filePath, true, false
         );
 
         return String.format("%s?%s", url, token);

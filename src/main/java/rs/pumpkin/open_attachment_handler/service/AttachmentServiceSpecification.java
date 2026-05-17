@@ -20,6 +20,8 @@ public interface AttachmentServiceSpecification<A extends AbstractAttachment> {
 
     AttachmentContent getContentById(UUID id);
 
+    String getContentUrlById(UUID id);
+
     URL getUrl(A attachment);
 
     void upload(A attachment, byte[] resource);

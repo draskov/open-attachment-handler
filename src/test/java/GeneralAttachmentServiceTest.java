@@ -119,6 +119,11 @@ public class GeneralAttachmentServiceTest {
         }
 
         @Override
+        public String getDownloadUrl(String filePath) {
+            return "https://files.test/" + filePath;
+        }
+
+        @Override
         public byte[] getFileContent(String filePath) {
             return new byte[0];
         }
